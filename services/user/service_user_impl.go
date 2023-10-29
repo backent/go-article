@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 
+	"github.com/backent/go-article/exception"
 	"github.com/backent/go-article/helpers"
 	"github.com/backent/go-article/models"
 	"github.com/backent/go-article/repositories/user"
@@ -43,7 +44,7 @@ func (implementation *ServiceUserImpl) Update(ctx context.Context, request webUs
 	defer helpers.CommitOrRollback(tx)
 
 	_, err = implementation.userRepository.FindById(ctx, tx, request.Id)
-	helpers.PanicIfError(err)
+	helpers.PanicIfError(exception.NewErrorNotFound(err.Error()))
 
 	user := models.User{
 		Id:       request.Id,
@@ -62,7 +63,7 @@ func (implementation *ServiceUserImpl) Delete(ctx context.Context, id int) {
 	defer helpers.CommitOrRollback(tx)
 
 	_, err = implementation.userRepository.FindById(ctx, tx, id)
-	helpers.PanicIfError(err)
+	helpers.PanicIfError(exception.NewErrorNotFound(err.Error()))
 
 	err = implementation.userRepository.Delete(ctx, tx, id)
 	helpers.PanicIfError(err)
@@ -73,7 +74,7 @@ func (implementation *ServiceUserImpl) FindById(ctx context.Context, id int) web
 	defer helpers.CommitOrRollback(tx)
 
 	user, err := implementation.userRepository.FindById(ctx, tx, id)
-	helpers.PanicIfError(err)
+	helpers.PanicIfError(exception.NewErrorNotFound(err.Error()))
 
 	return webUser.UserModelToResponse(user)
 }

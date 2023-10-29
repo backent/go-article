@@ -8,10 +8,20 @@ import (
 )
 
 func PanicHandler(w http.ResponseWriter, r *http.Request, i interface{}) {
-	response := web.WebResponse{
-		Code:   http.StatusInternalServerError,
-		Status: "Internal Server Error",
-		Data:   i,
+	var response web.WebResponse
+	errorNotFound, isErrorNotFound := i.(ErrorNotFound)
+	if isErrorNotFound {
+		response = web.WebResponse{
+			Code:   http.StatusNotFound,
+			Status: "Status Not Found",
+			Data:   errorNotFound.Error(),
+		}
+	} else {
+		response = web.WebResponse{
+			Code:   http.StatusInternalServerError,
+			Status: "Internal Server Error",
+			Data:   i,
+		}
 	}
 
 	helpers.ReturnResponseJSON(w, response)
