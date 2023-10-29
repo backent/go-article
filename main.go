@@ -8,15 +8,17 @@ import (
 	"github.com/backent/go-article/libs"
 	repositoriesUser "github.com/backent/go-article/repositories/user"
 	servicesUser "github.com/backent/go-article/services/user"
+	"github.com/go-playground/validator/v10"
 	"github.com/julienschmidt/httprouter"
 )
 
 func main() {
 
 	db := libs.Initiate()
+	validate := validator.New(validator.WithRequiredStructEnabled())
 
 	userRepository := repositoriesUser.NewRepositoryMysqlImpl()
-	userService := servicesUser.NewServiceUser(db, userRepository)
+	userService := servicesUser.NewServiceUser(db, userRepository, validate)
 	userController := controllersUser.NewControllerUser(userService)
 
 	router := httprouter.New()
