@@ -83,3 +83,21 @@ func (implementation *RepositoryUserMysqlImpl) FindAll(ctx context.Context, tx *
 
 	return users, nil
 }
+
+func (implementation *RepositoryUserMysqlImpl) FindByUsername(ctx context.Context, tx *sql.Tx, username string) (models.User, error) {
+	var user models.User
+	sql := "SELECT id, username, name FROM users WHERE username = ?"
+	rows, err := tx.QueryContext(ctx, sql, username)
+	if err != nil {
+		return user, err
+	}
+	defer rows.Close()
+
+	if rows.Next() {
+		rows.Scan(&user.Id, &user.Name, &user.Username)
+	} else {
+		return user, errors.New("user not found")
+	}
+
+	return user, nil
+}

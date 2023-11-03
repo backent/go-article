@@ -13,4 +13,5 @@ type RepositoryUserInterface interface {
 	Delete(ctx context.Context, tx *sql.Tx, id int) error
 	FindById(ctx context.Context, tx *sql.Tx, id int) (models.User, error)
 	FindAll(ctx context.Context, tx *sql.Tx) ([]models.User, error)
+	FindByUsername(ctx context.Context, tx *sql.Tx, username string) (models.User, error)
 }

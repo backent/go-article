@@ -16,6 +16,12 @@ func PanicHandler(w http.ResponseWriter, r *http.Request, i interface{}) {
 			Status: "Not Found",
 			Data:   err.Error(),
 		}
+	} else if err, ok := i.(Unauthorized); ok {
+		response = web.WebResponse{
+			Code:   http.StatusUnauthorized,
+			Status: "Unauthorized",
+			Data:   err.Error(),
+		}
 	} else if err, ok := i.(validator.ValidationErrors); ok {
 		response = web.WebResponse{
 			Code:   http.StatusBadRequest,
