@@ -43,7 +43,7 @@ func (implementation *ServiceAuthImpl) Login(ctx context.Context, request webAut
 		panic(exception.NewErrorNotFound(err.Error()))
 	}
 
-	if user.Name != request.Password {
+	if !helpers.CheckPassword(request.Password, user.Password) {
 		panic(exception.NewUnAuthorized("unauthorized"))
 	}
 
