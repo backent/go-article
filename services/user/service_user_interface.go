@@ -9,7 +9,7 @@ import (
 type ServiceUserInterface interface {
 	Create(ctx context.Context, request webUser.UserRequestCreate) webUser.UserResponse
 	Update(ctx context.Context, request webUser.UserRequestUpdate) webUser.UserResponse
-	Delete(ctx context.Context, id int)
+	Delete(ctx context.Context, request webUser.UserRequestDelete)
 	FindById(ctx context.Context, id int) webUser.UserResponse
 	FindAll(ctx context.Context) []webUser.UserResponse
 }

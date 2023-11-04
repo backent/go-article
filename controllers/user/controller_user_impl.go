@@ -25,7 +25,7 @@ func (implementation *ControllerUserImpl) Create(w http.ResponseWriter, r *http.
 	userCreateRequest := webUser.UserRequestCreate{}
 	helpers.DecodeRequestBody(r, &userCreateRequest)
 
-	ctx := context.Background()
+	ctx := context.WithValue(r.Context(), helpers.ContextKey("token"), r.Header.Get("Authorization"))
 
 	user := implementation.userService.Create(ctx, userCreateRequest)
 
@@ -41,7 +41,8 @@ func (implementation *ControllerUserImpl) Update(w http.ResponseWriter, r *http.
 	userUpdateRequest := webUser.UserRequestUpdate{}
 	helpers.DecodeRequestBody(r, &userUpdateRequest)
 
-	ctx := context.Background()
+	ctx := context.WithValue(r.Context(), helpers.ContextKey("token"), r.Header.Get("Authorization"))
+
 	id, err := strconv.Atoi(param.ByName("id"))
 	helpers.PanicIfError(err)
 
@@ -58,12 +59,12 @@ func (implementation *ControllerUserImpl) Update(w http.ResponseWriter, r *http.
 
 }
 func (implementation *ControllerUserImpl) Delete(w http.ResponseWriter, r *http.Request, param httprouter.Params) {
-
-	ctx := context.Background()
+	ctx := context.WithValue(r.Context(), helpers.ContextKey("token"), r.Header.Get("Authorization"))
 	id, err := strconv.Atoi(param.ByName("id"))
 	helpers.PanicIfError(err)
+	var request = webUser.UserRequestDelete{Id: id}
 
-	implementation.userService.Delete(ctx, id)
+	implementation.userService.Delete(ctx, request)
 
 	response := web.WebResponse{
 		Status: "OK",
@@ -74,7 +75,7 @@ func (implementation *ControllerUserImpl) Delete(w http.ResponseWriter, r *http.
 	helpers.ReturnResponseJSON(w, response)
 }
 func (implementation *ControllerUserImpl) FindById(w http.ResponseWriter, r *http.Request, param httprouter.Params) {
-	ctx := context.Background()
+	ctx := context.WithValue(r.Context(), helpers.ContextKey("token"), r.Header.Get("Authorization"))
 	id, err := strconv.Atoi(param.ByName("id"))
 	helpers.PanicIfError(err)
 
@@ -90,7 +91,7 @@ func (implementation *ControllerUserImpl) FindById(w http.ResponseWriter, r *htt
 
 }
 func (implementation *ControllerUserImpl) FindAll(w http.ResponseWriter, r *http.Request, param httprouter.Params) {
-	ctx := context.Background()
+	ctx := context.WithValue(r.Context(), helpers.ContextKey("token"), r.Header.Get("Authorization"))
 	users := implementation.userService.FindAll(ctx)
 
 	response := web.WebResponse{

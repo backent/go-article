@@ -40,7 +40,7 @@ func (implementation *RepositoryUserMysqlImpl) Update(ctx context.Context, tx *s
 	return user, nil
 }
 func (implementation *RepositoryUserMysqlImpl) Delete(ctx context.Context, tx *sql.Tx, id int) error {
-	sql := "DELETE users WHERE id = ?"
+	sql := "DELETE FROM users WHERE id = ?"
 	_, err := tx.ExecContext(ctx, sql, id)
 	if err != nil {
 		return err

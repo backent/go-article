@@ -60,17 +60,13 @@ func (implementation *ServiceUserImpl) Update(ctx context.Context, request webUs
 
 	implementation.middlewaresUser.Update(ctx, tx, &request)
 
-	user, err := implementation.userRepository.FindById(ctx, tx, request.Id)
-	if err != nil {
-		panic(exception.NewErrorNotFound(err.Error()))
-	}
-	hashedUserPassword := user.Password
+	hashedUserPassword := request.SavedPassword
 	if request.Password != "" {
 		hashedUserPassword, err = helpers.HashPassword(request.Password)
 		helpers.PanicIfError(err)
 	}
 
-	user = models.User{
+	user := models.User{
 		Id:       request.Id,
 		Username: request.Username,
 		Name:     request.Name,
@@ -82,17 +78,14 @@ func (implementation *ServiceUserImpl) Update(ctx context.Context, request webUs
 
 	return webUser.UserModelToResponse(user)
 }
-func (implementation *ServiceUserImpl) Delete(ctx context.Context, id int) {
+func (implementation *ServiceUserImpl) Delete(ctx context.Context, request webUser.UserRequestDelete) {
 	tx, err := implementation.DB.Begin()
 	helpers.PanicIfError(err)
 	defer helpers.CommitOrRollback(tx)
 
-	_, err = implementation.userRepository.FindById(ctx, tx, id)
-	if err != nil {
-		panic(exception.NewErrorNotFound(err.Error()))
-	}
+	implementation.middlewaresUser.Delete(ctx, tx, &request)
 
-	err = implementation.userRepository.Delete(ctx, tx, id)
+	err = implementation.userRepository.Delete(ctx, tx, request.Id)
 	helpers.PanicIfError(err)
 }
 func (implementation *ServiceUserImpl) FindById(ctx context.Context, id int) webUser.UserResponse {
@@ -100,6 +93,7 @@ func (implementation *ServiceUserImpl) FindById(ctx context.Context, id int) web
 	helpers.PanicIfError(err)
 	defer helpers.CommitOrRollback(tx)
 
+	implementation.middlewaresUser.FindById(ctx)
 	user, err := implementation.userRepository.FindById(ctx, tx, id)
 	if err != nil {
 		panic(exception.NewErrorNotFound(err.Error()))
@@ -111,6 +105,8 @@ func (implementation *ServiceUserImpl) FindAll(ctx context.Context) []webUser.Us
 	tx, err := implementation.DB.Begin()
 	helpers.PanicIfError(err)
 	defer helpers.CommitOrRollback(tx)
+
+	implementation.middlewaresUser.FindAll(ctx)
 
 	users, err := implementation.userRepository.FindAll(ctx, tx)
 	helpers.PanicIfError(err)

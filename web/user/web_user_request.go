@@ -11,4 +11,11 @@ type UserRequestUpdate struct {
 	Username string `json:"username"`
 	Name     string `json:"name"`
 	Password string `json:"password"`
+
+	// Not from request, for storing from middleware
+	SavedPassword string
+}
+
+type UserRequestDelete struct {
+	Id int
 }
