@@ -16,9 +16,9 @@ func NewRouter(
 	router.POST("/login", authController.Login)
 
 	router.POST("/users", userController.Create)
-	router.PUT("/users:id", userController.Update)
-	router.DELETE("/users:id", userController.Delete)
-	router.GET("/users:id", userController.FindById)
+	router.PUT("/users/:id", userController.Update)
+	router.DELETE("/users/:id", userController.Delete)
+	router.GET("/users/:id", userController.FindById)
 	router.GET("/users", userController.FindAll)
 
 	router.PanicHandler = exception.PanicHandler

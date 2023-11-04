@@ -16,8 +16,8 @@ func NewRepositoryMysqlImpl() RepositoryUserInterface {
 }
 
 func (implementation *RepositoryUserMysqlImpl) Create(ctx context.Context, tx *sql.Tx, user models.User) (models.User, error) {
-	sql := "INSERT INTO users (username, name) values (?, ?)"
-	result, err := tx.ExecContext(ctx, sql, user.Username, user.Name)
+	sql := "INSERT INTO users (username, name, password) values (?, ?, ?)"
+	result, err := tx.ExecContext(ctx, sql, user.Username, user.Name, user.Password)
 	if err != nil {
 		return user, err
 	}
@@ -31,8 +31,8 @@ func (implementation *RepositoryUserMysqlImpl) Create(ctx context.Context, tx *s
 	return user, nil
 }
 func (implementation *RepositoryUserMysqlImpl) Update(ctx context.Context, tx *sql.Tx, user models.User) (models.User, error) {
-	sql := "UPDATE users SET username = ?, name = ?  WHERE id = ?"
-	_, err := tx.ExecContext(ctx, sql, user.Username, user.Name, user.Id)
+	sql := "UPDATE users SET username = ?, name = ?, password = ?  WHERE id = ?"
+	_, err := tx.ExecContext(ctx, sql, user.Username, user.Name, user.Password, user.Id)
 	if err != nil {
 		return user, err
 	}
@@ -51,7 +51,7 @@ func (implementation *RepositoryUserMysqlImpl) Delete(ctx context.Context, tx *s
 
 func (implementation *RepositoryUserMysqlImpl) FindById(ctx context.Context, tx *sql.Tx, id int) (models.User, error) {
 	var user models.User
-	sql := "SELECT id, username, name FROM users WHERE id = ?"
+	sql := "SELECT id, username, name, password FROM users WHERE id = ?"
 	rows, err := tx.QueryContext(ctx, sql, id)
 	if err != nil {
 		return user, err
@@ -59,7 +59,7 @@ func (implementation *RepositoryUserMysqlImpl) FindById(ctx context.Context, tx 
 	defer rows.Close()
 
 	if rows.Next() {
-		rows.Scan(&user.Id, &user.Name, &user.Username)
+		rows.Scan(&user.Id, &user.Name, &user.Username, &user.Password)
 	} else {
 		return user, errors.New("user not found")
 	}

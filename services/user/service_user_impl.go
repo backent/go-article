@@ -34,9 +34,18 @@ func (implementation *ServiceUserImpl) Create(ctx context.Context, request webUs
 	helpers.PanicIfError(err)
 	defer helpers.CommitOrRollback(tx)
 
+	_, err = implementation.userRepository.FindByUsername(ctx, tx, request.Username)
+	if err == nil {
+		panic(exception.NewBadRequest("user exists."))
+	}
+
+	hashedPassword, err := helpers.HashPassword(request.Password)
+	helpers.PanicIfError(err)
+
 	user := models.User{
-		Username: request.Name,
+		Username: request.Username,
 		Name:     request.Name,
+		Password: hashedPassword,
 	}
 
 	user, err = implementation.userRepository.Create(ctx, tx, user)
@@ -51,14 +60,21 @@ func (implementation *ServiceUserImpl) Update(ctx context.Context, request webUs
 	helpers.PanicIfError(err)
 	defer helpers.CommitOrRollback(tx)
 
-	_, err = implementation.userRepository.FindById(ctx, tx, request.Id)
+	user, err := implementation.userRepository.FindById(ctx, tx, request.Id)
 	if err != nil {
 		panic(exception.NewErrorNotFound(err.Error()))
 	}
-	user := models.User{
+	hashedUserPassword := user.Password
+	if request.Password != "" {
+		hashedUserPassword, err = helpers.HashPassword(request.Password)
+		helpers.PanicIfError(err)
+	}
+
+	user = models.User{
 		Id:       request.Id,
 		Username: request.Username,
 		Name:     request.Name,
+		Password: hashedUserPassword,
 	}
 
 	user, err = implementation.userRepository.Update(ctx, tx, user)
