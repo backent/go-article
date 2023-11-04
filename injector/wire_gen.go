@@ -10,6 +10,7 @@ import (
 	auth3 "github.com/backent/go-article/controllers/auth"
 	user3 "github.com/backent/go-article/controllers/user"
 	"github.com/backent/go-article/libs"
+	"github.com/backent/go-article/middlewares"
 	"github.com/backent/go-article/repositories/auth"
 	"github.com/backent/go-article/repositories/user"
 	auth2 "github.com/backent/go-article/services/auth"
@@ -24,7 +25,8 @@ func InitializeRouter() *httprouter.Router {
 	db := libs.Initiate()
 	repositoryUserInterface := user.NewRepositoryMysqlImpl()
 	validate := libs.NewValidator()
-	serviceUserInterface := user2.NewServiceUser(db, repositoryUserInterface, validate)
+	userMiddleware := middlewares.NewUserMiddleware(validate, repositoryUserInterface)
+	serviceUserInterface := user2.NewServiceUser(db, repositoryUserInterface, userMiddleware)
 	controllerUserInterface := user3.NewControllerUser(serviceUserInterface)
 	repositoryAuthInterface := auth.NewRepositoryAuthJWTImpl()
 	serviceAuthInterface := auth2.NewServiceImpl(db, repositoryUserInterface, repositoryAuthInterface, validate)
@@ -35,6 +37,6 @@ func InitializeRouter() *httprouter.Router {
 
 // injector.go:
 
-var userSet = wire.NewSet(user.NewRepositoryMysqlImpl, user2.NewServiceUser, user3.NewControllerUser)
+var userSet = wire.NewSet(user.NewRepositoryMysqlImpl, user2.NewServiceUser, user3.NewControllerUser, middlewares.NewUserMiddleware)
 
 var authSet = wire.NewSet(auth3.NewControllerAuthImpl, auth2.NewServiceImpl, auth.NewRepositoryAuthJWTImpl)

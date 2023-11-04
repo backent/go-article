@@ -7,6 +7,7 @@ import (
 	controllersAuth "github.com/backent/go-article/controllers/auth"
 	controllersUser "github.com/backent/go-article/controllers/user"
 	"github.com/backent/go-article/libs"
+	middlewaresUser "github.com/backent/go-article/middlewares"
 	repositoriesAuth "github.com/backent/go-article/repositories/auth"
 	repositoriesUser "github.com/backent/go-article/repositories/user"
 	servicesAuth "github.com/backent/go-article/services/auth"
@@ -19,6 +20,7 @@ var userSet = wire.NewSet(
 	repositoriesUser.NewRepositoryMysqlImpl,
 	servicesUser.NewServiceUser,
 	controllersUser.NewControllerUser,
+	middlewaresUser.NewUserMiddleware,
 )
 
 var authSet = wire.NewSet(
