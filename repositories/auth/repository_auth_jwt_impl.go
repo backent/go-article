@@ -2,8 +2,11 @@ package auth
 
 import (
 	"fmt"
+	"os"
+	"strconv"
 	"time"
 
+	"github.com/backent/go-article/helpers"
 	"github.com/golang-jwt/jwt/v5"
 )
 
@@ -13,9 +16,13 @@ type RepositoryAuthJWTImpl struct {
 }
 
 func NewRepositoryAuthJWTImpl() RepositoryAuthInterface {
+
+	tokenLifeTime, err := strconv.Atoi(os.Getenv("APP_TOKEN_EXPIRE_IN_SEC"))
+	helpers.PanicIfError(err)
+
 	return &RepositoryAuthJWTImpl{
-		secretKeys:    []byte("awfe8j32jin9"),
-		tokenLifeTime: time.Now().Add(time.Hour * 3),
+		secretKeys:    []byte(os.Getenv("APP_SECRET_KEY")),
+		tokenLifeTime: time.Now().Add(time.Second * time.Duration(tokenLifeTime)),
 	}
 }
 

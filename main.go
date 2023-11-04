@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/backent/go-article/injector"
+	_ "github.com/joho/godotenv/autoload"
 )
 
 func main() {
