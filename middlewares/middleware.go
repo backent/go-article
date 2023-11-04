@@ -13,7 +13,7 @@ func ValidateToken(ctx context.Context, repositoriesAuth auth.RepositoryAuthInte
 	token := ctx.Value(helpers.ContextKey("token"))
 	tokenString, ok := token.(string)
 	if !ok || tokenString == "" {
-		helpers.PanicIfError("Not Authorized")
+		helpers.PanicIfError(exception.NewUnAuthorized(""))
 	}
 
 	isValid := repositoriesAuth.Validate(tokenString)
