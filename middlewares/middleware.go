@@ -8,7 +8,7 @@ import (
 	"github.com/backent/go-article/repositories/auth"
 )
 
-func ValidateToken(ctx context.Context, repositoriesAuth auth.RepositoryAuthInterface) {
+func ValidateToken(ctx context.Context, repositoriesAuth auth.RepositoryAuthInterface) int {
 	var tokenString string
 	token := ctx.Value(helpers.ContextKey("token"))
 	tokenString, ok := token.(string)
@@ -16,8 +16,9 @@ func ValidateToken(ctx context.Context, repositoriesAuth auth.RepositoryAuthInte
 		helpers.PanicIfError(exception.NewUnAuthorized(""))
 	}
 
-	isValid := repositoriesAuth.Validate(tokenString)
+	idInt, isValid := repositoriesAuth.Validate(tokenString)
 	if !isValid {
 		helpers.PanicIfError(exception.NewUnAuthorized(""))
 	}
+	return idInt
 }

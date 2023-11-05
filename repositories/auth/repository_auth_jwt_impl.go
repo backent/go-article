@@ -37,7 +37,7 @@ func (implementation *RepositoryAuthJWTImpl) Issue(payload string) (string, erro
 	generatedToken, err := token.SignedString(implementation.secretKeys)
 	return generatedToken, err
 }
-func (implementation *RepositoryAuthJWTImpl) Validate(tokenString string) bool {
+func (implementation *RepositoryAuthJWTImpl) Validate(tokenString string) (int, bool) {
 
 	// Parse takes the token string and a function for looking up the key. The latter is especially
 	// useful if you use multiple keys for your application.  The standard is to use 'kid' in the
@@ -53,9 +53,15 @@ func (implementation *RepositoryAuthJWTImpl) Validate(tokenString string) bool {
 		return implementation.secretKeys, nil
 	})
 
-	if _, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-		return true
+	if payload, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
+		if id, ok := payload["iss"].(string); ok {
+			intId, err := strconv.Atoi(id)
+			helpers.PanicIfError(err)
+			return intId, true
+		} else {
+			return 0, false
+		}
 	} else {
-		return false
+		return 0, false
 	}
 }
