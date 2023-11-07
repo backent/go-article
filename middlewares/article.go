@@ -3,6 +3,7 @@ package middlewares
 import (
 	"context"
 
+	"github.com/backent/go-article/helpers"
 	repositoriesArticle "github.com/backent/go-article/repositories/article"
 	repositoriesAuth "github.com/backent/go-article/repositories/auth"
 	repositoriesUser "github.com/backent/go-article/repositories/user"
@@ -27,7 +28,12 @@ func NewArticleMiddleware(validator *validator.Validate, repositoriesAuth reposi
 }
 
 func (implementation *ArticleMiddleware) Create(ctx context.Context, request *webArticle.ArticleRequestCreate) {
-	ValidateToken(ctx, implementation.RepositoryAuthInterface)
+	userId := ValidateToken(ctx, implementation.RepositoryAuthInterface)
+
+	err := implementation.validator.Struct(request)
+	helpers.PanicIfError(err)
+
+	request.UserId = userId
 
 }
 func (implementation *ArticleMiddleware) Update(ctx context.Context, request *webArticle.ArticleRequestUpdate) {
