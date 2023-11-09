@@ -12,7 +12,7 @@ import (
 
 type RepositoryAuthJWTImpl struct {
 	secretKeys    []byte
-	tokenLifeTime time.Time
+	tokenLifeTime int
 }
 
 func NewRepositoryAuthJWTImpl() RepositoryAuthInterface {
@@ -22,14 +22,14 @@ func NewRepositoryAuthJWTImpl() RepositoryAuthInterface {
 
 	return &RepositoryAuthJWTImpl{
 		secretKeys:    []byte(os.Getenv("APP_SECRET_KEY")),
-		tokenLifeTime: time.Now().Add(time.Second * time.Duration(tokenLifeTime)),
+		tokenLifeTime: tokenLifeTime,
 	}
 }
 
 func (implementation *RepositoryAuthJWTImpl) Issue(payload string) (string, error) {
 	// Create the Claims
 	claims := &jwt.RegisteredClaims{
-		ExpiresAt: jwt.NewNumericDate(implementation.tokenLifeTime),
+		ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Second * time.Duration(implementation.tokenLifeTime))),
 		Issuer:    payload,
 	}
 

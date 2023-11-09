@@ -11,5 +11,5 @@ type ServicesArticleInterface interface {
 	Update(ctx context.Context, request article.ArticleRequestUpdate) article.ArticleResponse
 	Delete(ctx context.Context, request article.ArticleRequestDelete) article.ArticleResponse
 	FindById(ctx context.Context, request article.ArticleRequestFindById) article.ArticleResponse
-	FindAll(ctx context.Context, request article.ArticleRequestFindAll) article.ArticleResponse
+	FindAll(ctx context.Context, request article.ArticleRequestFindAll) []article.ArticleResponse
 }

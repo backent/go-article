@@ -47,5 +47,16 @@ func (implementation *ControllerArticleImpl) FindById(w http.ResponseWriter, r *
 	panic("implement me")
 }
 func (implementation *ControllerArticleImpl) FindAll(w http.ResponseWriter, r *http.Request, param httprouter.Params) {
-	panic("implement me")
+	request := webArticle.ArticleRequestFindAll{}
+
+	ctx := context.WithValue(r.Context(), helpers.ContextKey("token"), r.Header.Get("Authorization"))
+	response := implementation.ServicesArticleInterface.FindAll(ctx, request)
+
+	webResponse := web.WebResponse{
+		Code:   http.StatusOK,
+		Status: "OK",
+		Data:   response,
+	}
+
+	helpers.ReturnResponseJSON(w, webResponse)
 }

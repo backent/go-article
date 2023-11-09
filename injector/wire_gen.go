@@ -36,7 +36,7 @@ func InitializeRouter() *httprouter.Router {
 	controllerAuthInterface := auth3.NewControllerAuthImpl(serviceAuthInterface)
 	repositoryArticleInterface := article.NewRepositoryArticleMysqlImpl()
 	articleMiddleware := middlewares.NewArticleMiddleware(validate, repositoryAuthInterface, repositoryArticleInterface, repositoryUserInterface)
-	servicesArticleInterface := article2.NewServicesArticleImpl(db, repositoryUserInterface, articleMiddleware)
+	servicesArticleInterface := article2.NewServicesArticleImpl(db, repositoryArticleInterface, articleMiddleware)
 	controllerArticleInterface := article3.NewControllerArticleImpl(servicesArticleInterface)
 	router := libs.NewRouter(controllerUserInterface, controllerAuthInterface, controllerArticleInterface)
 	return router

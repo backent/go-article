@@ -98,3 +98,39 @@ func (implementation *RepositoryArticleMysqlImpl) FindAll(ctx context.Context, t
 
 	return articles, nil
 }
+
+func (implementation *RepositoryArticleMysqlImpl) FindAllWithUserDetail(ctx context.Context, tx *sql.Tx) ([]models.Article, error) {
+
+	query := "SELECT articles.id, articles.user_id, articles.title, articles.content, users.id, users.username FROM articles LEFT JOIN users ON articles.user_id = users.id"
+	rows, err := tx.QueryContext(ctx, query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var articles []*models.Article
+	articleMap := make(map[int]*models.Article)
+
+	for rows.Next() {
+		var article models.Article
+		var user models.User
+
+		err = rows.Scan(&article.Id, &article.UserId, &article.Title, &article.Content, &user.Id, &user.Username)
+		if err != nil {
+			return nil, err
+		}
+		item, found := articleMap[article.Id]
+		if !found {
+			item = &article
+			articleMap[article.Id] = item
+			articles = append(articles, item)
+		}
+		item.UserDetails = user
+	}
+
+	var articlesReturn []models.Article
+	for _, val := range articles {
+		articlesReturn = append(articlesReturn, *val)
+	}
+	return articlesReturn, nil
+}

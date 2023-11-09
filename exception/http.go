@@ -6,9 +6,12 @@ import (
 	"github.com/backent/go-article/helpers"
 	"github.com/backent/go-article/web"
 	"github.com/go-playground/validator/v10"
+	"github.com/sirupsen/logrus"
 )
 
 func PanicHandler(w http.ResponseWriter, r *http.Request, i interface{}) {
+	logger := logrus.New()
+	logger.Warn(i)
 	var response web.WebResponse
 	if err, ok := i.(ErrorNotFound); ok {
 		response = web.WebResponse{

@@ -7,26 +7,25 @@ import (
 	"github.com/backent/go-article/helpers"
 	"github.com/backent/go-article/middlewares"
 	"github.com/backent/go-article/models"
-	repositoriesUser "github.com/backent/go-article/repositories/user"
-	"github.com/backent/go-article/web/article"
+	respositoriesArticle "github.com/backent/go-article/repositories/article"
 	webArticle "github.com/backent/go-article/web/article"
 )
 
 type ServicesArticleImpl struct {
 	DB *sql.DB
-	repositoriesUser.RepositoryUserInterface
+	respositoriesArticle.RepositoryArticleInterface
 	*middlewares.ArticleMiddleware
 }
 
-func NewServicesArticleImpl(db *sql.DB, repositoriesUser repositoriesUser.RepositoryUserInterface, articleMiddleware *middlewares.ArticleMiddleware) ServicesArticleInterface {
+func NewServicesArticleImpl(db *sql.DB, respositoriesArticle respositoriesArticle.RepositoryArticleInterface, articleMiddleware *middlewares.ArticleMiddleware) ServicesArticleInterface {
 	return &ServicesArticleImpl{
-		DB:                      db,
-		RepositoryUserInterface: repositoriesUser,
-		ArticleMiddleware:       articleMiddleware,
+		DB:                         db,
+		RepositoryArticleInterface: respositoriesArticle,
+		ArticleMiddleware:          articleMiddleware,
 	}
 }
 
-func (implementation *ServicesArticleImpl) Create(ctx context.Context, request article.ArticleRequestCreate) webArticle.ArticleResponse {
+func (implementation *ServicesArticleImpl) Create(ctx context.Context, request webArticle.ArticleRequestCreate) webArticle.ArticleResponse {
 	tx, err := implementation.DB.Begin()
 	helpers.PanicIfError(err)
 	defer helpers.CommitOrRollback(tx)
@@ -38,24 +37,31 @@ func (implementation *ServicesArticleImpl) Create(ctx context.Context, request a
 		Title:   request.Title,
 		Content: request.Content,
 	}
-	implementation.
-		article, err = implementation.RepositoryArticleInterface.Create(ctx, tx, article)
+	article, err = implementation.RepositoryArticleInterface.Create(ctx, tx, article)
 
-	user
 	helpers.PanicIfError(err)
 
-	return webArticle.ArticleModelToArticleResponse(article)
+	return webArticle.ArticleModelToResponse(article)
 
 }
-func (implementation *ServicesArticleImpl) Update(ctx context.Context, request article.ArticleRequestUpdate) article.ArticleResponse {
+func (implementation *ServicesArticleImpl) Update(ctx context.Context, request webArticle.ArticleRequestUpdate) webArticle.ArticleResponse {
 	panic("awd")
 }
-func (implementation *ServicesArticleImpl) Delete(ctx context.Context, request article.ArticleRequestDelete) article.ArticleResponse {
+func (implementation *ServicesArticleImpl) Delete(ctx context.Context, request webArticle.ArticleRequestDelete) webArticle.ArticleResponse {
 	panic("awd")
 }
-func (implementation *ServicesArticleImpl) FindById(ctx context.Context, request article.ArticleRequestFindById) article.ArticleResponse {
+func (implementation *ServicesArticleImpl) FindById(ctx context.Context, request webArticle.ArticleRequestFindById) webArticle.ArticleResponse {
 	panic("awd")
 }
-func (implementation *ServicesArticleImpl) FindAll(ctx context.Context, request article.ArticleRequestFindAll) article.ArticleResponse {
-	panic("awd")
+func (implementation *ServicesArticleImpl) FindAll(ctx context.Context, request webArticle.ArticleRequestFindAll) []webArticle.ArticleResponse {
+	tx, err := implementation.DB.Begin()
+	helpers.PanicIfError(err)
+	defer helpers.CommitOrRollback(tx)
+
+	implementation.ArticleMiddleware.FindAll(ctx, &request)
+
+	articles, err := implementation.RepositoryArticleInterface.FindAllWithUserDetail(ctx, tx)
+	helpers.PanicIfError(err)
+
+	return webArticle.ArticlesModelToResponses(articles)
 }

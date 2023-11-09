@@ -13,4 +13,5 @@ type RepositoryArticleInterface interface {
 	Delete(ctx context.Context, tx *sql.Tx, id int) error
 	FindById(ctx context.Context, tx *sql.Tx, id int) (models.Article, error)
 	FindAll(ctx context.Context, tx *sql.Tx) ([]models.Article, error)
+	FindAllWithUserDetail(ctx context.Context, tx *sql.Tx) ([]models.Article, error)
 }
