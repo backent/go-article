@@ -101,3 +101,46 @@ func (implementation *RepositoryUserMysqlImpl) FindByUsername(ctx context.Contex
 
 	return user, nil
 }
+
+func (implementation *RepositoryUserMysqlImpl) FindAllWithArticles(ctx context.Context, tx *sql.Tx) ([]models.User, error) {
+	query := "SELECT users.id, users.username, users.name, users.password, articles.id, articles.user_id, articles.title FROM users LEFT JOIN articles ON users.id = articles.user_id"
+	rows, err := tx.QueryContext(ctx, query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var users []*models.User
+	var usersMap = make(map[int]*models.User)
+	for rows.Next() {
+		user := models.User{}
+		var articleId sql.NullInt64
+		var articleUserId sql.NullInt64
+		var articleTitle sql.NullString
+		err = rows.Scan(&user.Id, &user.Name, &user.Username, &user.Password, &articleId, &articleUserId, &articleTitle)
+		if err != nil {
+			return nil, err
+		}
+
+		item, isFound := usersMap[user.Id]
+		if !isFound {
+			item = &user
+			usersMap[item.Id] = item
+			users = append(users, item)
+		}
+		if articleId.Valid {
+			item.Articles = append(item.Articles, models.Article{
+				Id:     int(articleId.Int64),
+				Title:  articleTitle.String,
+				UserId: int(articleUserId.Int64),
+			})
+		}
+	}
+
+	var usersReturn []models.User
+	for _, val := range users {
+		usersReturn = append(usersReturn, *val)
+	}
+
+	return usersReturn, nil
+}

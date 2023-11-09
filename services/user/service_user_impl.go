@@ -108,7 +108,7 @@ func (implementation *ServiceUserImpl) FindAll(ctx context.Context) []webUser.Us
 
 	implementation.middlewaresUser.FindAll(ctx)
 
-	users, err := implementation.userRepository.FindAll(ctx, tx)
+	users, err := implementation.userRepository.FindAllWithArticles(ctx, tx)
 	helpers.PanicIfError(err)
 
 	return webUser.UsersModelToResponses(users)
