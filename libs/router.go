@@ -16,6 +16,7 @@ func NewRouter(
 	router := httprouter.New()
 
 	router.POST("/login", authController.Login)
+	router.POST("/register", authController.Register)
 
 	router.POST("/users", userController.Create)
 	router.PUT("/users/:id", userController.Update)

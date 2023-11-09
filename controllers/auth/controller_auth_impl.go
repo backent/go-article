@@ -36,3 +36,21 @@ func (implementation *ControllerAuthImpl) Login(w http.ResponseWriter, r *http.R
 
 	helpers.ReturnResponseJSON(w, response)
 }
+
+func (implementation *ControllerAuthImpl) Register(w http.ResponseWriter, r *http.Request, param httprouter.Params) {
+	var registerRequest webAuth.RegisterRequest
+
+	helpers.DecodeRequestBody(r, &registerRequest)
+
+	ctx := context.Background()
+
+	loginResponse := implementation.ServiceAuthInterface.Register(ctx, registerRequest)
+
+	response := web.WebResponse{
+		Code:   http.StatusOK,
+		Status: "OK",
+		Data:   loginResponse,
+	}
+
+	helpers.ReturnResponseJSON(w, response)
+}

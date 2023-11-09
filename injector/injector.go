@@ -8,8 +8,7 @@ import (
 	controllersAuth "github.com/backent/go-article/controllers/auth"
 	controllersUser "github.com/backent/go-article/controllers/user"
 	"github.com/backent/go-article/libs"
-	middlewaresArticle "github.com/backent/go-article/middlewares"
-	middlewaresUser "github.com/backent/go-article/middlewares"
+	"github.com/backent/go-article/middlewares"
 	repositoriesArticle "github.com/backent/go-article/repositories/article"
 	repositoriesAuth "github.com/backent/go-article/repositories/auth"
 	repositoriesUser "github.com/backent/go-article/repositories/user"
@@ -24,20 +23,21 @@ var userSet = wire.NewSet(
 	repositoriesUser.NewRepositoryMysqlImpl,
 	servicesUser.NewServiceUser,
 	controllersUser.NewControllerUser,
-	middlewaresUser.NewUserMiddleware,
+	middlewares.NewUserMiddleware,
 )
 
 var articleSet = wire.NewSet(
 	repositoriesArticle.NewRepositoryArticleMysqlImpl,
 	servicesArticle.NewServicesArticleImpl,
 	controllersArticle.NewControllerArticleImpl,
-	middlewaresArticle.NewArticleMiddleware,
+	middlewares.NewArticleMiddleware,
 )
 
 var authSet = wire.NewSet(
 	controllersAuth.NewControllerAuthImpl,
 	servicesAuth.NewServiceImpl,
 	repositoriesAuth.NewRepositoryAuthJWTImpl,
+	middlewares.NewAuthMiddleware,
 )
 
 func InitializeRouter() *httprouter.Router {

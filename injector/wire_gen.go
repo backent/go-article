@@ -32,7 +32,8 @@ func InitializeRouter() *httprouter.Router {
 	userMiddleware := middlewares.NewUserMiddleware(validate, repositoryUserInterface, repositoryAuthInterface)
 	serviceUserInterface := user2.NewServiceUser(db, repositoryUserInterface, userMiddleware)
 	controllerUserInterface := user3.NewControllerUser(serviceUserInterface)
-	serviceAuthInterface := auth2.NewServiceImpl(db, repositoryUserInterface, repositoryAuthInterface, validate)
+	authMiddleware := middlewares.NewAuthMiddleware(validate, repositoryUserInterface, repositoryAuthInterface)
+	serviceAuthInterface := auth2.NewServiceImpl(db, repositoryUserInterface, repositoryAuthInterface, validate, authMiddleware)
 	controllerAuthInterface := auth3.NewControllerAuthImpl(serviceAuthInterface)
 	repositoryArticleInterface := article.NewRepositoryArticleMysqlImpl()
 	articleMiddleware := middlewares.NewArticleMiddleware(validate, repositoryAuthInterface, repositoryArticleInterface, repositoryUserInterface)
@@ -48,4 +49,4 @@ var userSet = wire.NewSet(user.NewRepositoryMysqlImpl, user2.NewServiceUser, use
 
 var articleSet = wire.NewSet(article.NewRepositoryArticleMysqlImpl, article2.NewServicesArticleImpl, article3.NewControllerArticleImpl, middlewares.NewArticleMiddleware)
 
-var authSet = wire.NewSet(auth3.NewControllerAuthImpl, auth2.NewServiceImpl, auth.NewRepositoryAuthJWTImpl)
+var authSet = wire.NewSet(auth3.NewControllerAuthImpl, auth2.NewServiceImpl, auth.NewRepositoryAuthJWTImpl, middlewares.NewAuthMiddleware)
